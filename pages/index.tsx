@@ -6,7 +6,7 @@ import Card from "../components/card";
 import styles from "../styles/Home.module.css";
 import coffeeStoresJson from "../data/coffee-stores.json";
 
-interface ICoffeeStore {
+export interface ICoffeeStore {
   id: number;
   name: string;
   imgUrl: string;
