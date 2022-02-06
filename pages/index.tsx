@@ -1,10 +1,27 @@
-import type { NextPage } from "next";
+import type { GetStaticProps, NextPage } from "next";
 import Head from "next/head";
 import Image from "next/image";
 import Banner from "../components/banner";
+import Card from "../components/card";
 import styles from "../styles/Home.module.css";
+import coffeeStoresJson from "../data/coffee-stores.json";
 
-const Home: NextPage = () => {
+interface ICoffeeStore {
+  id: number;
+  name: string;
+  imgUrl: string;
+  websiteUrl: string;
+  address: string;
+  neighbourhood: string;
+}
+
+interface IProps {
+  coffeeStores: ICoffeeStore[];
+}
+
+const Home: NextPage<IProps> = ({ coffeeStores }) => {
+  // console.log(props);
+
   const handleOnBannerBtnClick = () => {
     console.log("clicked");
   };
@@ -29,9 +46,33 @@ const Home: NextPage = () => {
             height={400}
           />
         </div>
+        {coffeeStores.length > 0 && (
+          <div className={styles.sectionWrapper}>
+            <h2 className={styles.heading2}>Toronto stores</h2>
+            <div className={styles.cardLayout}>
+              {coffeeStores.map((store) => (
+                <Card
+                  key={store.id}
+                  name={store.name}
+                  imgUrl={store.imgUrl}
+                  href={"/coffee-store/" + store.id}
+                />
+              ))}
+            </div>
+          </div>
+        )}
       </main>
     </div>
   );
 };
 
 export default Home;
+export const getStaticProps: GetStaticProps = async (context) => {
+  console.log(context);
+
+  return {
+    props: {
+      coffeeStores: coffeeStoresJson,
+    }, // will be passed to the page component as props
+  };
+};

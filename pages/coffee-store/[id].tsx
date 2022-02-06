@@ -5,7 +5,10 @@ const CoffeeStore = () => {
   const { id } = useRouter().query;
   return (
     <div>
-      {id} <Link href={"/"}>Back to home</Link>
+      {id}{" "}
+      <Link href={"/"}>
+        <a>Back to home</a>
+      </Link>
     </div>
   );
 };
