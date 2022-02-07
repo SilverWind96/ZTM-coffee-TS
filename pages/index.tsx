@@ -1,10 +1,14 @@
+import { log } from "console";
 import type { GetStaticProps, NextPage } from "next";
 import Head from "next/head";
 import Image from "next/image";
+import { useContext, useEffect, useState } from "react";
 import Banner from "../components/banner";
 import Card from "../components/card";
+import useTrackLocation from "../hooks/use-track-location";
 import { fetchCoffeeStores } from "../lib/coffee-stores";
 import styles from "../styles/Home.module.css";
+import { ACTION_TYPES, StoreContext } from "./_app";
 
 export interface ICoffeeStore {
   fsq_id: string;
@@ -25,11 +29,39 @@ interface IProps {
 }
 
 const Home: NextPage<IProps> = ({ coffeeStores }) => {
-  console.log(coffeeStores);
+  // console.log(coffeeStores);
+  const { handleTrackLocation, locationErrorMsg, isFindingLocation } =
+    useTrackLocation();
+  // const [coffeeStoresNearMe, setCoffeeStoreNearMe] = useState<ICoffeeStore[]>(
+  //   []
+  // );
+  const [error, setError] = useState<any>(null);
+
+  const { dispatch, state } = useContext(StoreContext);
 
   const handleOnBannerBtnClick = () => {
-    console.log("clicked");
+    // console.log("clicked");
+    handleTrackLocation();
   };
+
+  useEffect(() => {
+    const fetchCoffeeStoresNearMe = async () => {
+      if (state.latLong) {
+        try {
+          const storesNearMe = await fetchCoffeeStores(state.latLong, 30);
+          dispatch({
+            type: ACTION_TYPES.SET_COFFEE_STORES,
+            payload: { coffeeStores: storesNearMe },
+          });
+        } catch (error: any) {
+          console.log({ error });
+          setError(error.message);
+        }
+      }
+    };
+    fetchCoffeeStoresNearMe();
+  }, [state.latLong, dispatch]);
+
   return (
     <div className={styles.container}>
       <Head>
@@ -40,9 +72,11 @@ const Home: NextPage<IProps> = ({ coffeeStores }) => {
 
       <main className={styles.main}>
         <Banner
-          buttonText="View stores nearby"
+          buttonText={isFindingLocation ? "Locating..." : "View stores nearby"}
           handleOnClick={handleOnBannerBtnClick}
         />
+        {locationErrorMsg && "Error: " + locationErrorMsg}
+        {error && "Error: " + error}
         <div className={styles.heroImage}>
           <Image
             src="/static/hero-image.png"
@@ -51,6 +85,21 @@ const Home: NextPage<IProps> = ({ coffeeStores }) => {
             height={400}
           />
         </div>
+        {state.coffeeStores.length > 0 && (
+          <div className={styles.sectionWrapper}>
+            <h2 className={styles.heading2}>Stores Near Me</h2>
+            <div className={styles.cardLayout}>
+              {state.coffeeStores.map((store) => (
+                <Card
+                  key={store.fsq_id}
+                  name={store.name}
+                  imgUrl={store.imgUrl}
+                  href={"/coffee-store/" + store.fsq_id}
+                />
+              ))}
+            </div>
+          </div>
+        )}
         {coffeeStores.length > 0 && (
           <div className={styles.sectionWrapper}>
             <h2 className={styles.heading2}>Toronto stores</h2>

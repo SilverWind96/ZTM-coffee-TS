@@ -19,9 +19,10 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
 
   return {
     props: {
-      coffeeStore: coffeeStores.find(
-        (store: ICoffeeStore) => store.fsq_id.toString() === params?.id
-      ),
+      coffeeStore:
+        coffeeStores.find(
+          (store: ICoffeeStore) => store.fsq_id.toString() === params?.id
+        ) || {},
     },
   };
 };

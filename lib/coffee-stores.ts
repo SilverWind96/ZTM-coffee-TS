@@ -7,14 +7,14 @@ const unsplashApi = createApi({
 const getListOfCoffeeStorePhotos = async () => {
   const photos = await unsplashApi.search.getPhotos({
     query: "coffee shop",
-    perPage: 10,
+    perPage: 40,
   });
   const unsplashResults = photos.response?.results;
   return unsplashResults?.map((result) => result.urls.regular);
 };
 
 export const fetchCoffeeStores = async (
-  latLong = "20.994910,105.777014",
+  latLong = "43.65267326999575,-79.39545615725015",
   limit = 8
 ) => {
   const photos = await getListOfCoffeeStorePhotos();
@@ -40,19 +40,3 @@ const getUrlForCoffeeStores = (
 ) => {
   return `https://api.foursquare.com/v3/places/nearby?ll=${latLong}&query=${query}&limit=${limit}`;
 };
-
-// export const fetchCoffeeStorePhotos = async (fsq_id: string) => {
-//   //   const photos = await getListOfCoffeeStorePhotos();
-//   const response = await fetch(
-//     `https://api.foursquare.com/v3/places/${fsq_id}/photos`,
-//     {
-//       headers: {
-//         Authorization: process.env.NEXT_PUBLIC_FOURSQUARE_API_KEY || "",
-//       },
-//     }
-//   );
-//   const data = await response.json();
-//   // console.log(data);
-
-//   return data;
-// };
