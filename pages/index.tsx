@@ -3,16 +3,21 @@ import Head from "next/head";
 import Image from "next/image";
 import Banner from "../components/banner";
 import Card from "../components/card";
+import { fetchCoffeeStores } from "../lib/coffee-stores";
 import styles from "../styles/Home.module.css";
-import coffeeStoresJson from "../data/coffee-stores.json";
 
 export interface ICoffeeStore {
-  id: number;
+  fsq_id: string;
   name: string;
   imgUrl: string;
   websiteUrl: string;
-  address: string;
   neighbourhood: string;
+  location: {
+    address: string;
+    address_extended: string;
+    cross_street: string;
+    region: string;
+  };
 }
 
 interface IProps {
@@ -20,7 +25,7 @@ interface IProps {
 }
 
 const Home: NextPage<IProps> = ({ coffeeStores }) => {
-  // console.log(props);
+  console.log(coffeeStores);
 
   const handleOnBannerBtnClick = () => {
     console.log("clicked");
@@ -52,10 +57,10 @@ const Home: NextPage<IProps> = ({ coffeeStores }) => {
             <div className={styles.cardLayout}>
               {coffeeStores.map((store) => (
                 <Card
-                  key={store.id}
+                  key={store.fsq_id}
                   name={store.name}
                   imgUrl={store.imgUrl}
-                  href={"/coffee-store/" + store.id}
+                  href={"/coffee-store/" + store.fsq_id}
                 />
               ))}
             </div>
@@ -67,12 +72,14 @@ const Home: NextPage<IProps> = ({ coffeeStores }) => {
 };
 
 export default Home;
+
 export const getStaticProps: GetStaticProps = async (context) => {
-  console.log(context);
+  // console.log(context);
+  const coffeStores = await fetchCoffeeStores();
 
   return {
     props: {
-      coffeeStores: coffeeStoresJson,
+      coffeeStores: coffeStores,
     }, // will be passed to the page component as props
   };
 };
