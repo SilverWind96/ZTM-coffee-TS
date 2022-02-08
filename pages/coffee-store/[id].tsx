@@ -9,6 +9,10 @@ import {
   // fetchCoffeeStorePhotos,
   fetchCoffeeStores,
 } from "../../lib/coffee-stores";
+import { useContext, useEffect, useState } from "react";
+// import { StoreContext } from "../_app";
+import { isEmpty } from "../../utils";
+import { StoreContext } from "../../store/store-context";
 
 export const getStaticProps: GetStaticProps = async ({ params }) => {
   const coffeeStores = await fetchCoffeeStores();
@@ -43,7 +47,32 @@ export const getStaticPaths = async () => {
 };
 
 const CoffeeStore = ({ coffeeStore }: { coffeeStore: ICoffeeStore }) => {
-  const { isFallback } = useRouter();
+  const {
+    isFallback,
+    query: { id },
+  } = useRouter();
+
+  const [_coffeeStore, _setCoffeeStore] = useState(coffeeStore);
+
+  const {
+    state: { coffeeStores },
+  } = useContext(StoreContext);
+
+  // useEffect(() => {
+  //   if (isEmpty(coffeeStore)) {
+  //     if (coffeeStores.length > 0) {
+  //       const coffeeStoreFromContext = coffeeStores.find((coffeeStore) => {
+  //         return coffeeStore.fsq_id.toString() === id; //dynamic id
+  //       });
+
+  //       if (coffeeStoreFromContext) {
+  //         _setCoffeeStore(coffeeStoreFromContext);
+  //         // handleCreateCoffeeStore(coffeeStoreFromContext);
+  //       }
+  //     }
+  //   }
+  // }, [coffeeStore, id, coffeeStores]);
+
   if (isFallback) {
     return <div>Loading...</div>;
   }
