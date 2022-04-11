@@ -1,4 +1,3 @@
-import { log } from "console";
 import type { GetStaticProps, NextPage } from "next";
 import Head from "next/head";
 import Image from "next/image";
@@ -29,18 +28,13 @@ interface IProps {
 }
 
 const Home: NextPage<IProps> = ({ coffeeStores }) => {
-  // console.log(coffeeStores);
   const { handleTrackLocation, locationErrorMsg, isFindingLocation } =
     useTrackLocation();
-  // const [coffeeStoresNearMe, setCoffeeStoreNearMe] = useState<ICoffeeStore[]>(
-  //   []
-  // );
   const [error, setError] = useState<any>(null);
 
   const { dispatch, state } = useContext(StoreContext);
 
   const handleOnBannerBtnClick = () => {
-    // console.log("clicked");
     handleTrackLocation();
   };
 
@@ -48,11 +42,20 @@ const Home: NextPage<IProps> = ({ coffeeStores }) => {
     const fetchCoffeeStoresNearMe = async () => {
       if (state.latLong) {
         try {
-          const storesNearMe = await fetchCoffeeStores(state.latLong, 30);
+          const res = await fetch(
+            `/api/getCoffeeStoresByLocation?latLong=${
+              state.latLong
+            }&limit=${30}`
+          );
+          const coffeeStores = await res.json();
+          console.log("====================================");
+          console.log({ coffeeStores });
+          console.log("====================================");
           dispatch({
             type: ACTION_TYPES.SET_COFFEE_STORES,
-            payload: { coffeeStores: storesNearMe },
+            payload: { coffeeStores: coffeeStores },
           });
+          setError(null);
         } catch (error: any) {
           console.log({ error });
           setError(error.message);
@@ -123,12 +126,11 @@ const Home: NextPage<IProps> = ({ coffeeStores }) => {
 export default Home;
 
 export const getStaticProps: GetStaticProps = async (context) => {
-  // console.log(context);
   const coffeStores = await fetchCoffeeStores();
 
   return {
     props: {
       coffeeStores: coffeStores,
-    }, // will be passed to the page component as props
+    },
   };
 };

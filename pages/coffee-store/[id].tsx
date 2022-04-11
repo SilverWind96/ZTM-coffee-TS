@@ -5,21 +5,13 @@ import { useRouter } from "next/router";
 import { ICoffeeStore } from "..";
 import styles from "../../styles/coffee-store.module.css";
 import Image from "next/image";
-import {
-  // fetchCoffeeStorePhotos,
-  fetchCoffeeStores,
-} from "../../lib/coffee-stores";
+import { fetchCoffeeStores } from "../../lib/coffee-stores";
 import { useContext, useEffect, useState } from "react";
-// import { StoreContext } from "../_app";
 import { isEmpty } from "../../utils";
 import { StoreContext } from "../../store/store-context";
 
 export const getStaticProps: GetStaticProps = async ({ params }) => {
   const coffeeStores = await fetchCoffeeStores();
-  // let coffeeStorePhotos;
-  // if (params && typeof params.id === "string") {
-  //   coffeeStorePhotos = await fetchCoffeeStorePhotos(params.id);
-  // }
 
   return {
     props: {
@@ -58,20 +50,20 @@ const CoffeeStore = ({ coffeeStore }: { coffeeStore: ICoffeeStore }) => {
     state: { coffeeStores },
   } = useContext(StoreContext);
 
-  // useEffect(() => {
-  //   if (isEmpty(coffeeStore)) {
-  //     if (coffeeStores.length > 0) {
-  //       const coffeeStoreFromContext = coffeeStores.find((coffeeStore) => {
-  //         return coffeeStore.fsq_id.toString() === id; //dynamic id
-  //       });
+  useEffect(() => {
+    if (isEmpty(coffeeStore)) {
+      if (coffeeStores.length > 0) {
+        const coffeeStoreFromContext = coffeeStores.find((coffeeStore) => {
+          return coffeeStore.fsq_id.toString() === id; //dynamic id
+        });
 
-  //       if (coffeeStoreFromContext) {
-  //         _setCoffeeStore(coffeeStoreFromContext);
-  //         // handleCreateCoffeeStore(coffeeStoreFromContext);
-  //       }
-  //     }
-  //   }
-  // }, [coffeeStore, id, coffeeStores]);
+        if (coffeeStoreFromContext) {
+          _setCoffeeStore(coffeeStoreFromContext);
+          // handleCreateCoffeeStore(coffeeStoreFromContext);
+        }
+      }
+    }
+  }, [coffeeStore, id, coffeeStores]);
 
   if (isFallback) {
     return <div>Loading...</div>;
